@@ -2,6 +2,6 @@ body {
   background-color: white;
   font-family: sans-serif;
 }
-.Todo-Item:hover .trash-icon {
+.Todo-item:hover .trash-icon {
   display: block;
 }
