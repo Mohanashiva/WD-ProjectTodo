@@ -20,12 +20,15 @@ app.get("/", async (request, response) => {
     const overdueTodos = await Todo.overdue();
     const duetodayTodos = await Todo.dueToday();
     const duelaterTodos = await Todo.dueLater();
+    const completedTodos = await Todo.completedTodos();
+
     if (request.accepts("html")) {
       response.render("index", {
         title: "To-Do Manager",
         overdueTodos,
         duetodayTodos,
         duelaterTodos,
+        completedTodos,
         csrfToken: request.csrfToken(),
       });
     } else {
@@ -33,6 +36,7 @@ app.get("/", async (request, response) => {
         overdueTodos,
         duetodayTodos,
         duelaterTodos,
+        completedTodos,
       });
     }
   } catch (error) {
@@ -43,6 +47,7 @@ app.get("/", async (request, response) => {
 
 // eslint-disable-next-line no-undef
 app.get("/todos", async function (_request, response) {
+  console.log("processing list of all todos..");
   try {
     const todos = await Todo.findAll({
       order: [["id", "ASC"]],
@@ -83,11 +88,12 @@ app.post("/todos", async (request, response) => {
 });
 
 //PUT  url
-app.put("/todos/:id/markAsCompleted", async (request, response) => {
+app.put("/todos/:id", async (request, response) => {
   console.log("we have to update a todo with ID:", request.params.id);
-  const todo = await Todo.findByPk(request.params.id);
+
   try {
-    const updatedTodo = await todo.markAsCompleted();
+    const todo = await Todo.findByPk(request.params.id);
+    const updatedTodo = await todo.setCompletionStatus(request.body.completed);
     return response.json(updatedTodo);
   } catch (error) {
     console.log(error);
@@ -98,8 +104,8 @@ app.put("/todos/:id/markAsCompleted", async (request, response) => {
 app.delete("/todos/:id", async function (request, response) {
   console.log("We have to delete a Todo with ID: ", request.params.id);
   try {
-    await Todo.remove(request.params.id);
-    return response.json({ sucess: true });
+    const result = await Todo.remove(request.params.id);
+    return response.json({ success: result == 1 });
   } catch (error) {
     return response.status(422).json(error);
   }

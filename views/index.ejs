@@ -13,13 +13,14 @@
         var token = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
-        function updateTodo(id) {
-            fetch(`/todos/${id}/markAsCompleted`,
+        function updateTodo(id,torf) {
+            fetch(`/todos/${id}`,
                 {
                     method: "put",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        "_csrf": token
+                        "_csrf": token,
+                        "completed":torf
                     })
                 })
 
@@ -64,7 +65,7 @@
                                 class="border border-gray-300  rounded text-grey-900 w-full p-2 text-sm" required />
                         </div>
                         <div class="flex-auto">
-                            <input type="date" name="dueDate"
+                            <input required type="date" name="dueDate"
                                 class="border border-gray-300  rounded text-grey-900 w-full p-2 leading-4 text-sm" />
                         </div>
                         <div class="flex-none">
