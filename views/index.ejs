@@ -13,14 +13,14 @@
         var token = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
-        function updateTodo(id,torf) {
+        function updateTodo(id,status) {
             fetch(`/todos/${id}`,
                 {
                     method: "put",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         "_csrf": token,
-                        "completed":torf
+                        "completed":status
                     })
                 })
 
@@ -74,7 +74,12 @@
                         </div>
                     </div>
                 </form>
-                <%- include('todos.ejs') %>
+                <div>
+                    <%- include('todos.ejs', {title: "Overdue", data: overdueTodos}) %>
+                    <%- include('todos.ejs', {title: "Due Today", data: duetodayTodos}) %>
+                    <%- include('todos.ejs', {title: "Due Later", data: duelaterTodos}) %>
+                    <%- include('todos.ejs', {title: "Completed Items", data: completedTodos}) %>
+          </div>
         </div>
     </div>
 </body>

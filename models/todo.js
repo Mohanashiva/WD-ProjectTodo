@@ -64,8 +64,8 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-    setCompletionStatus(torf) {
-      return this.update({ completed: torf });
+    setCompletionStatus(status) {
+      return this.update({ completed: status });
     }
     static addTodo({ title, dueDate }) {
       return this.create({ title: title, dueDate: dueDate, completed: false });

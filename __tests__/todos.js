@@ -96,8 +96,20 @@ describe("List the todo items", function () {
         _csrf: csrfToken,
         completed: true,
       });
-    let parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
+    const parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
     expect(parsedUpdateResponse.completed).toBe(true);
+
+    res = await agent.get("/");
+    csrfToken = extractCsrfToken(res);
+
+    const markInCompleteResponse = await agent
+      .put(`/todos/${latestTodo.id}`)
+      .send({
+        _csrf: csrfToken,
+        completed: false,
+      });
+    const parsedUpdateResponse2 = JSON.parse(markInCompleteResponse.text);
+    expect(parsedUpdateResponse2.completed).toBe(false);
   });
 
   test("Deleting a todo with given id", async () => {
@@ -119,7 +131,7 @@ describe("List the todo items", function () {
 
     res = await agent.get("/");
     csrfToken = extractCsrfToken(res);
-
+    //testing case
     const todoid = latestTodo.id;
     const deleteResponseTrue = await agent.delete(`/todos/${todoid}`).send({
       _csrf: csrfToken,
