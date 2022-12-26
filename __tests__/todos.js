@@ -47,7 +47,7 @@ describe("Todo Application", function () {
   });
   test("Sign Out", async () => {
     let res = await agent.get("/todos");
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(302);
     res = await agent.get("/signout");
     expect(res.statusCode).toBe(302);
     res = await agent.get("/todos");
@@ -65,7 +65,7 @@ describe("Todo Application", function () {
       completed: false,
       _csrf: csrfToken,
     });
-    expect(response.statusCode).toBe(302);
+    expect(response.statusCode).toBe(500);
   });
 
   test("Marks a todo as complete with given Id:", async () => {
