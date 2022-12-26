@@ -72,6 +72,15 @@
                     </div>
                 </form>
                 <div>
+                    <% if(messages && messages.error && messages.error.length> 0) { %>
+                        <% for(var i=0; i<messages.error.length; i++) { %>
+                            <li class="text-white rounded px-4 py-4 bg-red-500">
+                                <%= messages.error[i] %>
+                            </li>
+                            <% } %>
+                                <% } %>
+                </div>
+                <div>
                     <%- include('todo.ejs', {title: "Overdue" , data: overdueTodos}) %>
                         <%- include('todo.ejs', {title: "Due Today" , data: duetodayTodos}) %>
                             <%- include('todo.ejs', {title: "Due Later" , data: duelaterTodos}) %>

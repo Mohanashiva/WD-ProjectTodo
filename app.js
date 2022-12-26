@@ -9,6 +9,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+const flash = require("connect-flash");
 
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
@@ -23,6 +24,9 @@ app.use(bodyParser.json());
 app.set("view engine", "ejs");
 // eslint-disable-next-line no-undef
 app.use(express.static(path.join(__dirname, "public")));
+// eslint-disable-next-line no-undef
+app.set("views", path.join(__dirname, "views"));
+app.use(flash());
 
 app.get("/", async (request, response) => {
   response.render("index", {
@@ -38,6 +42,10 @@ app.use(
     },
   })
 );
+app.use(function (request, response, next) {
+  response.locals.messages = request.flash();
+  next();
+});
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(
@@ -53,11 +61,11 @@ passport.use(
           if (result) {
             return done(null, user);
           } else {
-            return done("Invalid Password");
+            return done(null, false, { message: "Invalid Password" });
           }
         })
-        .catch((error) => {
-          return error;
+        .catch(function () {
+          return done(null, false, { message: "Unrecognized Email" });
         });
     }
   )
@@ -130,9 +138,29 @@ app.get("/signup", (request, response) => {
 });
 
 app.post("/users", async (request, response) => {
+  //console.log("Firstname", request.body.firstName)
+  if (request.body.firstName == false) {
+    request.flash("error", "Please Enter Your First Name");
+    return response.redirect("/signup");
+  }
+  if (request.body.lastName == false) {
+    request.flash("error", "Please Enter Your Last Name");
+    return response.redirect("/signup");
+  }
+  if (request.body.password == false) {
+    request.flash("error", "Please Enter Password");
+    return response.redirect("/signup");
+  }
+  if (request.body.password.length < 8) {
+    request.flash(
+      "error",
+      "Yout password length should be minimum of 8 characters!"
+    );
+    return response.redirect("/signup");
+  }
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
-  //console.log("Firstname", request.body.firstName)
+
   //have to create the user here
   try {
     const user = await User.create({
@@ -144,11 +172,14 @@ app.post("/users", async (request, response) => {
     request.login(user, (err) => {
       if (err) {
         console.log(err);
+        response.redirect("/");
+      } else {
+        response.redirect("/todos");
       }
-      response.redirect("/todos");
     });
   } catch (error) {
-    console.log(error);
+    request.flash("error", error.message);
+    return response.redirect("/signup");
   }
 });
 
@@ -157,7 +188,10 @@ app.get("/login", (request, response) => {
 });
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
   (request, response) => {
     console.log(request.user);
     response.redirect("/todos");
@@ -200,6 +234,15 @@ app.post(
   "/todos",
   connectEnsureLogin.ensureLoggedIn(),
   async function (request, response) {
+    if (request.body.title.length < 4) {
+      request.flash("error", "To-Do is not long enough");
+      return response.redirect("/todos");
+    }
+    let dueDateError = request.body.dueDate;
+    if (dueDateError == false) {
+      request.flash("error", "Please pick a date");
+      return response.redirect("/todos");
+    }
     try {
       await Todo.addTodo({
         title: request.body.title,
