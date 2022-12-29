@@ -17,8 +17,8 @@
 <body>
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <%- include('header.ejs') %>
-                <h6 class="py-4">Signup as a new user</h6>
+            <a href="/" class="hover:text-cyan-400"> <%- include('header.ejs') %> </a>
+            <h6 class="py-4 text-xl">Signup as a new user</h6>
                 <div>
                     <% if(messages && messages.error && messages.error.length> 0) { %>
                         <% for(var i=0; i<messages.error.length; i++) { %>
@@ -33,22 +33,22 @@
                     <div class="py-3">
                         <label for="firstName">First Name:</label>
                         <input type="text" name="firstName"
-                            class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full" placeholder="Enter First Name..">
                     </div>
                     <div class="py-3">
                         <label for="lastName">Last Name:</label>
                         <input type="text" name="lastName"
-                            class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full" placeholder="Enter Last Name..">
                     </div>
                     <div class="py-3">
                         <label for="email">Email:</label>
                         <input type="email" name="email"
-                            class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full" placeholder="Enter Email..">
                     </div>
                     <div class="py-3">
                         <label for="password">Password</label>
                         <input type="password" name="password"
-                            class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full" placeholder="Enter Password..">
                     </div>
                     <div class="py-3">
                         <button type="submit"

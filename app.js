@@ -28,12 +28,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "views"));
 app.use(flash());
 
-app.get("/", async (request, response) => {
-  response.render("index", {
-    title: "Todo application",
-    csrfToken: request.csrfToken(),
-  });
-});
 app.use(
   session({
     secret: "my-secret-super-key-10181810",
@@ -93,6 +87,9 @@ app.get(
       const duetodayTodos = await Todo.dueToday(loggedInUserId);
       const duelaterTodos = await Todo.dueLater(loggedInUserId);
       const completedTodos = await Todo.completedTodos(loggedInUserId);
+      const firstName = request.user.firstName;
+      const lastName = request.user.lastName;
+      const userName = firstName + " " + lastName;
       if (request.accepts("html")) {
         response.render("todos", {
           title: "To-Do Manager",
@@ -100,6 +97,7 @@ app.get(
           duetodayTodos,
           duelaterTodos,
           completedTodos,
+          userName,
           csrfToken: request.csrfToken(),
         });
       } else {
@@ -181,6 +179,23 @@ app.post("/users", async (request, response) => {
     request.flash("error", error.message);
     return response.redirect("/signup");
   }
+});
+
+app.get("/", async (request, response) => {
+  if (request.user) {
+    return response.redirect("/todos");
+  } else {
+    response.render("index", {
+      title: "ToDo-Application",
+      csrfToken: request.csrfToken(),
+    });
+  }
+});
+app.get("/home", async (request, response) => {
+  return response.render("index", {
+    title: "ToDo-Application",
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.get("/login", (request, response) => {
